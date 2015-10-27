@@ -6,7 +6,7 @@ public class SensorTableModel extends AbstractTableModel {
 
 	private String[] sensors;
 	private String[] names;
-	private Double[] values;
+	public Double[] values;
 	private String[] columnNames = TableColumn.getNames();
 	private Class<?>[] columnClasses = Constants.COLUMN_CLASSES;
 
@@ -17,6 +17,18 @@ public class SensorTableModel extends AbstractTableModel {
 		this.values = values;
 	}
 
+	public SensorTableModel()
+	{
+		this(new String[0], new String[0], new Double[0]);
+	}
+	
+	public void updateData(String[] sensors, String[] names, Double[] values)
+	{
+		this.sensors = sensors;
+		this.names = names;
+		this.values = values;
+	}
+	
 	// Returns a constant columns number for this model
 	public int getColumnCount() {
 		return Constants.COLUMN_CLASSES.length;
