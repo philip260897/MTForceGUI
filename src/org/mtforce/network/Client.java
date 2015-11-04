@@ -22,8 +22,20 @@ public class Client
 			oo = new ObjectOutputStream(socket.getOutputStream());
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			
 		} 
+	}
+	
+	public void disconnect()
+	{
+		try{
+			oi.close();
+			oo.close();
+			socket.close();
+		}catch(Exception ex)
+		{
+			ex.printStackTrace();
+		}
 	}
 	
 	public void write(CmdPackage pkg) throws Exception

@@ -39,6 +39,7 @@ public class MainWindow {
 	private static JTextField txtIp;
 	private static SensorTableModel tableModel;
 
+	private static boolean connectionLoop = false;
 	private static int reconnectDelay = 5;
 	private static Client client = null;
 	private static CmdPackage commandPkg;
@@ -117,14 +118,28 @@ public class MainWindow {
 		ctrlPane.add(txtIp);
 		txtIp.setColumns(10);
 		
-		JButton btnConnect = new JButton("Connect");
+		final JButton btnConnect = new JButton("Connect");
 		btnConnect.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) 
 			{
-				if(txtIp.getText() != "")
+				if(!connectionLoop)
 				{
-					client = new Client(txtIp.getText(), 9999);
-					txtIp.setEnabled(false);
+					if(txtIp.getText() != "")
+					{
+						client = new Client(txtIp.getText(), 9999);
+						txtIp.setEnabled(false);
+						connectionLoop = true;
+						btnConnect.setText("Disconnect");
+					}
+				}
+				else
+				{
+					btnConnect.setText("Connect");
+					connectionLoop = false;
+					if(client != null)
+						client.disconnect();
+					client = null;
+					txtIp.setEnabled(true);
 				}
 			}
 		});
@@ -197,11 +212,15 @@ public class MainWindow {
 			}
 			else
 			{
-				for(int i = 0; i < reconnectDelay; i++) {
-					System.out.println(reconnectDelay-i+" seconds till reconnect...");
-					try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+				if(connectionLoop) {
+					System.out.println("Connection failed to "+txtIp.getText()+":"+9999+". Attempting to reconnect in "+reconnectDelay+" seconds.");
+					for(int i = 0; i < reconnectDelay; i++) {
+						
+						try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+					}
+					System.out.println("reconnecting ...");
+					client = new Client(txtIp.getText(), 9999);
 				}
-				client = new Client(txtIp.getText(), 9999);
 			}
 			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 		}
