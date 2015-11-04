@@ -35,8 +35,9 @@ public class MainWindow {
 	private static JTextField txtIp;
 	private static SensorTableModel tableModel;
 
+	private static int reconnectDelay = 5;
 	private static Client client = null;
-	
+	private static CmdPackage commandPkg;
 	
 	/**
 	 * Launch the application.
@@ -56,27 +57,7 @@ public class MainWindow {
 			}
 		});
 		
-		CmdPackage pkg = new CmdPackage();
-		pkg.setRequestUpdate(true);
-		while(true)
-		{
-			if(client != null)
-			{
-				try
-				{
-					client.write(pkg);
-					InfoPackage info = client.read();
-					updateInfo(info);
-					
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
-			}
-			
-			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
-		}
+		handleServerConnection();
 	}
 
 	private static void updateInfo(InfoPackage info)
@@ -130,6 +111,7 @@ public class MainWindow {
 				if(txtIp.getText() != "")
 				{
 					client = new Client(txtIp.getText(), 9999);
+					txtIp.setEnabled(false);
 				}
 			}
 		});
@@ -160,6 +142,39 @@ public class MainWindow {
 			// If the given lf is not available, you can set the GUI the system
 			// default L&F.
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		}
+	}
+	
+	private static void handleServerConnection()
+	{
+
+		while(true)
+		{
+			if(client != null)
+			{
+				commandPkg = new CmdPackage();
+				commandPkg.setRequestUpdate(true);
+				try
+				{
+					client.write(commandPkg);
+					InfoPackage info = client.read();
+					updateInfo(info);
+					
+				}
+				catch(Exception ex)
+				{
+					client = null;
+				}
+			}
+			else
+			{
+				for(int i = 0; i < reconnectDelay; i++) {
+					System.out.println(reconnectDelay-i+" seconds till reconnect...");
+					try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+				}
+				client = new Client(txtIp.getText(), 9999);
+			}
+			try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
 }
