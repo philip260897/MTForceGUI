@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Calendar;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -27,6 +28,9 @@ import org.mtforce.network.InfoPackage;
 import org.mtforce.table.Constants;
 import org.mtforce.table.SensorTableModel;
 import java.awt.FlowLayout;
+import javax.swing.JLabel;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class MainWindow {
 
@@ -36,12 +40,18 @@ public class MainWindow {
 	private static SensorTableModel tableModel;
 
 	private static Client client = null;
+	private static int sleep = 1000;
+	private static JTextField textField;
 	
 	
 	/**
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		
+		
+		
+		
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
@@ -56,14 +66,20 @@ public class MainWindow {
 			}
 		});
 		
-		CmdPackage pkg = new CmdPackage();
-		pkg.setRequestUpdate(true);
+
+		
+		
 		while(true)
 		{
 			if(client != null)
 			{
 				try
 				{
+					CmdPackage pkg = new CmdPackage();
+					pkg.setRequestUpdate(true);
+					pkg.setToggleFreq(sleep);
+					
+					
 					client.write(pkg);
 					InfoPackage info = client.read();
 					updateInfo(info);
@@ -120,6 +136,7 @@ public class MainWindow {
 		ctrlPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		
 		txtIp = new JTextField();
+		txtIp.setText("10.0.108.65");
 		ctrlPane.add(txtIp);
 		txtIp.setColumns(10);
 		
@@ -134,6 +151,21 @@ public class MainWindow {
 			}
 		});
 		ctrlPane.add(btnConnect);
+		
+		JLabel lblBlinkFreq = new JLabel("Blink Freq:");
+		ctrlPane.add(lblBlinkFreq);
+		
+		textField = new JTextField();
+		textField.setText("1");
+		textField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				try{
+					sleep = (int)((1.0 / Double.parseDouble(textField.getText())) * 1000.0);
+				}catch(Exception ex){textField.setText("");}
+			}
+		});
+		ctrlPane.add(textField);
+		textField.setColumns(10);
 		splitPane.setDividerLocation(35);
 		splitPane.setEnabled(false);
 
@@ -141,7 +173,7 @@ public class MainWindow {
 		JFrame frame = new JFrame("Swing JTable Demo");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(splitPane);
-		frame.setSize(362, 428);
+		frame.setSize(420, 428);
 		//frame.pack();
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
