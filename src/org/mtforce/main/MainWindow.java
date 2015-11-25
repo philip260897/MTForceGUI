@@ -153,7 +153,7 @@ public class MainWindow {
 		textField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try{
-					sleep = (int)((1.0 / Double.parseDouble(textField.getText())) * 1000.0);
+					sleep = (int)((1.0 / Double.parseDouble(textField.getText())) * 1000.0) / 2;
 				}catch(Exception ex){textField.setText("");}
 			}
 		});
@@ -164,6 +164,12 @@ public class MainWindow {
 
 		// Display it all in a scrolling window and make the window appear
 		JFrame frame = new JFrame("Swing JTable Demo");
+		frame.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				
+			}
+		});
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().add(splitPane);
 		frame.setSize(420, 428);

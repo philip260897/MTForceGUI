@@ -20,6 +20,7 @@ public class SensorTableModel extends AbstractTableModel {
 	public SensorTableModel()
 	{
 		this(new String[0], new String[0], new Double[0]);
+		
 	}
 	
 	public void updateData(String[] sensors, String[] names, Double[] values)
